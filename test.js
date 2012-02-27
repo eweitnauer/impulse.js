@@ -9,15 +9,15 @@ function init() {
   for (var i=0; i<N; i++) {
     var pos = new Point(r+Math.random()*(w-2*r), r+Math.random()*(h-2*r));
     var vel = new Point();
-    world.bodies.push(new Body(pos, vel, 1, 0, 0, 1));
+    world.bodies.push(new Body(pos, vel, Math.random()+0.5, 0, 0, 1));
   }
   
   show();
   setInterval(function() {
     world.step(1/30);
     circle
-      .attr("cx", function(d) { return d.pos.x; })
-      .attr("cy", function(d) { return d.pos.y; })
+      .attr("cx", function(d) { return d.s.x; })
+      .attr("cy", function(d) { return d.s.y; })
   }, 1000/30);
 }
 
@@ -36,8 +36,8 @@ function show() {
         .attr("stroke", "black")
         .attr("stroke-width", "2px")
         .attr("r", 0)
-        .attr("cx", function(d) { return d.pos.x; })
-        .attr("cy", function(d) { return d.pos.y; })
+        .attr("cx", function(d) { return d.s.x; })
+        .attr("cy", function(d) { return d.s.y; })
         .call(drag);
   circle.transition(1000)
           .duration(500)
@@ -45,7 +45,7 @@ function show() {
 
   function dragmove(d, i) {
     d3.select(this)
-      .attr("cx", d.pos.x = Math.max(r, Math.min(w - r, d3.event.x)))
-      .attr("cy", d.pos.y = Math.max(r, Math.min(h - r, d3.event.y)));
+      .attr("cx", d.s.x = Math.max(r, Math.min(w - r, d3.event.x)))
+      .attr("cy", d.s.y = Math.max(r, Math.min(h - r, d3.event.y)));
   }
 }
