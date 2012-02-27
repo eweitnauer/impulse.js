@@ -1,31 +1,47 @@
+/// Copyright by Erik Weitnauer, 2012.
+
 Body = function(position, linear_velocity, mass, rotation, angular_velocity, inertia) {
-  this.pos = position;
-  this.dpos = linear_velocity;
-  this.mass = mass;
-  this.rot = rotation;
-  this.drot = angular_velocity;
-  this.inertia = inertia;
+  this.s = position;
+  this.v = linear_velocity;
+  this.m = mass;
+  this.r = rotation;
+  this.w = angular_velocity;
+  this.I = inertia;
   this.dynamic = true;
-  this.forces = new Point(0,0); // central forces acting on cog
+  this.force = new Point(0,0); // external forces acting on cog
+  this.torque = 0;
 }
 
-/// forces are cleared afterwards
+/// external forces are cleared afterwards
 Body.prototype.integrate = function(h) {
-  this.pos.Add(this.dpos.scale(h)).Add(this.forces.scale(0.5*h*h));
-  this.dpos.Add(this.forces.scale(h));
-  this.rot += h*this.drot;
-  this.forces.set(0,0);
+  // s(t0 + h) = s(t0) + v(t0)*h + 0.5*(1/m)*F*h*h
+  this.s.Add(this.v.scale(h)).Add(this.force.scale(0.5*h*h/this.m));
+  // v(t0 + h) = v(t0) + (1/m)*F*h
+  this.v.Add(this.force.scale(h/this.m));
+  // r(t0 + h) = r(t0) + h*w + 0.5*(1/I)*T*h*h;
+  this.r += h*this.w + 0.5/this.I*this.torque*h*h;
+  // w(t0 + h) = w(t0) + (1/I)*T*h
+  this.w += this.torque/this.I*h;
+  this.force.set(0,0);
+  this.torque = 0;
 }
 
+/// Apply an impulse to the body which results in a direct change of velocity.
 /// pos is optional and in world coords.
-Body.prototype.applyImpulse = function(imp, pos) {
-  this.dpos.Add(imp.scale(1/this.mass));
-  if (typeof(pos) !== 'undefined') {
-    this.drot.Add(pos.sub(this.pos).cross(imp) * (1/this.inertia));
-  }
+Body.prototype.applyImpulse = function(p, pos) {
+  this.v.Add(p.scale(1/this.m));
+  if (typeof(pos) == 'undefined') return;
+  this.w.Add(pos.sub(this.pos).cross(p) * (1/this.I));
 }
 
-/// Adds a central, constant force to the forces vector, which is applied at integrate.
-Body.prototype.applyForce = function(force) {
-  this.forces.Add(force);
+/// Apply a constant force to the body for the next time step.
+/// pos is in world coordinates and its default is the cog of the object.
+Body.prototype.applyForce = function(F, pos) {
+  this.force.Add(F);
+  if (typeof(pos) == 'undefined') return;
+  this.torque += F.cross(pos.sub(this.s));
+}
+
+Body.prototype.to_world = function(s_local) {
+  return this.s.add(s_local.rotate(this.r));
 }

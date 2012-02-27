@@ -1,6 +1,9 @@
+/// Copyright by Erik Weitnauer, 2012.
+
 World = function() {
-  this.gravity = new Point(0, 10)
+  this.gravity = new Point(0, 0)
   this.bodies = []
+  this.joints = []
 }
 
 World.prototype.step = function(h) {
@@ -19,6 +22,6 @@ World.prototype.integrate = function(h) {
 World.prototype.applyGravity = function() {
   for (var i=0; i<this.bodies.length; i++) {
     var body = this.bodies[i];
-    if (body.dynamic) body.applyForce(this.gravity);
+    if (body.dynamic) body.applyForce(this.gravity.scale(body.m));
   }
 }
