@@ -25,17 +25,6 @@ function show() {
       .attr("width", w)
       .attr("height", h)
 
-  bodies = svg.selectAll("circle.body")
-        .data(world.bodies)
-        .enter().append("circle")
-        .attr("fill", "rgba(0,0,0,0)")
-        .attr("stroke", "black")
-        .attr("stroke-width", "2px")
-        .attr("r", r)
-        .attr("cx", function(d) { return d.s.x; })
-        .attr("cy", function(d) { return d.s.y; })
-        .call(drag);
-
   joints = svg.selectAll("line.g")
       .data(world.joints)
       .enter().append("g")
@@ -43,22 +32,33 @@ function show() {
   joints.append("line")
       .attr("class", "A")
       .style("stroke-width", 2)
-      .style("stroke", "black");
+      .style("stroke", "green");
   joints.append("line")
       .attr("class", "B")
       .style("stroke-width", 2)
-      .style("stroke", "black");
+      .style("stroke", "blue");
   joints.append("circle")
       .attr("class", "A")
       .attr("fill", "rgba(0,255,0,0.5)")
       .attr("stroke", "none")
-      .attr("r", 10)
+      .attr("r", 11)
   joints.append("circle")
       .attr("class", "B")
       .attr("fill", "rgba(0,0,255,0.5)")
       .attr("stroke", "none")
-      .attr("r", 10)
+      .attr("r", 9)
 
+  bodies = svg.selectAll("circle.body")
+        .data(world.bodies)
+        .enter().append("circle")
+        .attr("fill", "gray")
+        .attr("stroke", "black")
+        .attr("stroke-width", "2px")
+        .attr("r", r)
+        .attr("cx", function(d) { return d.s.x; })
+        .attr("cy", function(d) { return d.s.y; })
+        .call(drag);
+        
   function dragmove(d, i) {
     d.s.x = Math.max(r, Math.min(w - r, d3.event.x));
     d.s.y = Math.max(r, Math.min(h - r, d3.event.y));
