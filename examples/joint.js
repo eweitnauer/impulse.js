@@ -2,9 +2,9 @@ var world = new World();
 var w = 960,
     h = 600,
     r = 5,
-    scale = 25, // 1 m in physic = 100 pixel in visualization
+    scale = 15, // 1 m in physic = 100 pixel in visualization
     len = 1,
-    timestep = 1/200;
+    timestep = 1/100;
 var bodies, joints, v_bodies;
 var timer_id;
 
@@ -13,7 +13,7 @@ function init() {
       I = 1/3*mass*len; // Inertia eines langen Stabes
       //I = 1/2*mass*r*r/scale/scale; // Inertia einer Kreisscheibe
 
-  var N = 20; // number of swinging bars
+  var N = 30; // number of swinging bars
   var bs = [];
   bs.push(new Body(new Point(w/scale/2, len), new Point(), mass, 0, 0, I));
   bs[0].dynamic = false;
@@ -78,7 +78,7 @@ function init() {
           timer_id = setInterval(function() {
             world.step(timestep);
             update();
-          }, 1000/30);
+          }, 1000/100);
         } else {
           this.innerHTML = "Play";
           clearInterval(timer_id);

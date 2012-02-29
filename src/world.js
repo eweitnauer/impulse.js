@@ -1,5 +1,23 @@
 /// Copyright by Erik Weitnauer, 2012.
 
+// TODO: In velocity and position control, things might get worse when using a
+// timestep that is too big. Therefore, we need an algorithm that automatically
+// reduces the timestep each time a corrections step makes things worse.
+// With the reduced timestep, the simulation needs to be stepped more often to
+// reach the original timestep.
+
+// Things that improve iterative performance (a lot):
+// 1) Scale the correction impulses with 1.5
+// 2) Stop position and velocity correction, if result get worse in one step
+// Actually, this is already quite good, so I don't know if we should change
+// this.
+
+// TODO: Implement the LGS-method that solves a linear equations system to
+// correct the joints.
+
+// TODO: Plot the engery of the chain over time to see if and how it changes
+// during simulation for different methods.
+
 World = function() {
   this.gravity = new Point(0, 10)
   this.bodies = []
@@ -38,8 +56,10 @@ World.prototype.jointPositionCorrection = function(h) {
     change = false;
     var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      //change = change || this.joints[i].correctPosition(h);
-      now += this.joints[i].correctPosition(h);
+      this.joints[i].correctPosition(h);
+    }
+    for (var i=0; i<this.joints.length; i++) {
+      now += this.joints[i].getPositionError(h);
     }
     change = now<last;
     last = now;
@@ -57,11 +77,13 @@ World.prototype.jointVelocityCorrection = function() {
   var change;
   var last = Infinity;
   do {
-    //change = false;
+    change = false;
     var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      //change = change || this.joints[i].correctVelocity();
-      now += this.joints[i].correctVelocity();
+      this.joints[i].correctVelocity();
+    }
+    for (var i=0; i<this.joints.length; i++) {
+      now += this.joints[i].getVelocityError();
     }
     change = now<last;
     last = now;
