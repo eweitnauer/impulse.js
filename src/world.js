@@ -4,8 +4,8 @@ World = function() {
   this.gravity = new Point(0, 10)
   this.bodies = []
   this.joints = []
-  this.max_corr_it = 50;
-  this.max_vcorr_it = 50;
+  this.max_corr_it = 100;
+  this.max_vcorr_it = 100;
 }
 
 World.prototype.stepA = function(h) {
@@ -32,16 +32,16 @@ World.prototype.step = function(h) {
 /// when doing a time step h.
 World.prototype.jointPositionCorrection = function(h) {
   var iterations = 0;
-  var done;
+  var change;
   do {
     iterations++;
-    done = true;
+    change = false;
     for (var i=0; i<this.joints.length; i++) {
-      done = done && this.joints[i].correctPosition(h);
+      change = change || this.joints[i].correctPosition(h);
     }
-  } while (!done && iterations<this.max_corr_it);
+  } while (change && iterations<this.max_corr_it);
   console.log(iterations);
-  return done;
+  return change;
 }
 
 /// For each joint, impulses are applied to its bodies, so they have the same
@@ -55,7 +55,7 @@ World.prototype.jointVelocityCorrection = function() {
       change = change || this.joints[i].correctVelocity();
     }
     if (change) iterations++;
-  } while (change && iterations<<this.max_vcorr_it);
+  } while (change && iterations<this.max_vcorr_it);
   console.log('v', iterations);
   return change;
 }

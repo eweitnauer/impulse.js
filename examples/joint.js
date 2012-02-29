@@ -1,25 +1,28 @@
 var world = new World();
 var w = 960,
     h = 500,
-    r = 15,
-    scale = 1000, // 1 m in physic = 1000 pixel in visualization
-    timestep = 1/60;
+    r = 5,
+    scale = 100, // 1 m in physic = 100 pixel in visualization
+    timestep = 1/100;
 var bodies, joints, v_bodies;
 var timer_id;
 
 function init() {
-  var b1, b2, b3;
   var mass = 1,
       len = 100/scale,
-      //I = 1/3*mass*len; // Inertia eines langen Stabes
-      I = 1/2*mass*r*r/scale/scale; // Inertia einer Kreisscheibe
-      
-  world.bodies.push(b1 = new Body(new Point(w/scale/2, 2/scale*r), new Point(), mass, 0, 0, I));
-  b1.dynamic = false;
-  world.bodies.push(b2 = new Body(new Point(w/scale/2+50/scale, len+2/scale*r), new Point(), mass, 1, 0, I));
-  world.bodies.push(b3 = new Body(new Point(w/scale/2+100/scale, len/2+2/scale*r), new Point(), mass, 0, 0, I));
-  world.joints.push(new Joint(b1, new Point(0,len/2), b2, new Point(0,len/2)));
-//  world.joints.push(new Joint(b2, new Point(0,-len/2), b3, new Point(len/2,0)));
+      I = 1/3*mass*len; // Inertia eines langen Stabes
+      //I = 1/2*mass*r*r/scale/scale; // Inertia einer Kreisscheibe
+
+  var N = 3; // number of swinging bars
+  var bs = [];
+  bs.push(new Body(new Point(w/scale/2, 20/scale), new Point(), mass, 0, 0, I));
+  bs[0].dynamic = false;
+  world.bodies.push(bs[0]);
+  for (var i=0; i<N; i++) {
+    bs.push(new Body(new Point(w/scale/2 + (i+0.5)*len, 20/scale + len/2), new Point(), mass, -Math.PI*0.5, 0, I));
+    world.bodies.push(bs[i+1]);
+    world.joints.push(new Joint(bs[i], new Point(0,len/2), bs[i+1], new Point(0,-len/2)));
+  }
     
   show();
   
@@ -33,7 +36,7 @@ function init() {
         world.stepA(timestep);
         update();
      });
-   // stepB button
+  // stepB button
   d3.select("body").append("a")
     .text("Integrate")
     .attr("class", "button")
@@ -88,30 +91,30 @@ function show() {
       .attr("class", "joint")
   joints.append("line")
       .attr("class", "A")
-      .style("stroke-width", 2)
-      .style("stroke", "green");
+      .style("stroke-width", 5)
+      .style("stroke", "rgba(0,255,0,0.8)");
   joints.append("line")
       .attr("class", "B")
-      .style("stroke-width", 2)
+      .style("stroke-width", 5)
       .style("stroke", "blue");
   joints.append("circle")
       .attr("class", "A")
-      .attr("fill", "rgba(0,255,0,0.5)")
+      .attr("fill", "rgba(0,255,0,1)")
       .attr("stroke", "none")
-      .attr("r", 11)
+      .attr("r", 4)
   joints.append("circle")
       .attr("class", "B")
-      .attr("fill", "rgba(0,0,255,0.5)")
+      .attr("fill", "rgba(0,0,255,1)")
       .attr("stroke", "none")
-      .attr("r", 9)
+      .attr("r", 4)
   joints.append("line")
       .attr("class", "Av")
-      .style("stroke-width", 2)
-      .style("stroke", "rgba(255,0,0,0.5)");
+      .style("stroke-width", 1)
+      .style("stroke", "rgba(255,0,0,0.2)");
   joints.append("line")
       .attr("class", "Bv")
-      .style("stroke-width", 2)
-      .style("stroke", "rgba(255,0,0,0.5)");
+      .style("stroke-width", 1)
+      .style("stroke", "rgba(255,0,0,0.2)");
 
 
   bodies = svg.selectAll("circle.body")
@@ -120,7 +123,7 @@ function show() {
         .attr("fill", "gray")
         .attr("stroke", "black")
         .attr("stroke-width", "2px")
-        .attr("r", r)
+        .attr("r", r-2)
         .attr("cx", function(d) { return d.s.x; })
         .attr("cy", function(d) { return d.s.y; })
         .call(drag);
@@ -129,8 +132,8 @@ function show() {
         .data(world.bodies)
         .enter().append("line")
         .attr("class", "v_body")
-        .attr("stroke-width", "2px")
-        .attr("stroke", "red");
+        .attr("stroke-width", "1px")
+        .attr("stroke", "rgba(255,0,0,0.2)");
 
   update();
   
@@ -148,18 +151,18 @@ function update() {
   v_bodies
     .attr("x1", function(d) { return d.s.x*scale; })
     .attr("y1", function(d) { return d.s.y*scale; })
-    .attr("x2", function(d) { return d.s.x*scale + d.v.x*scale/30; })
-    .attr("y2", function(d) {  return d.s.y*scale + d.v.y*scale/30; });
+    .attr("x2", function(d) { return d.s.x*scale + d.v.x*scale*timestep; })
+    .attr("y2", function(d) {  return d.s.y*scale + d.v.y*scale*timestep; });
   joints.selectAll("line.Av")
     .attr("x1", function(d) { return d.aInWorld().x*scale; })
     .attr("y1", function(d) { return d.aInWorld().y*scale; })
-    .attr("x2", function(d) { return d.aInWorld().x*scale + d.body_a.get_v_at(d.aInWorld()).x*scale/30; })
-    .attr("y2", function(d) { return d.aInWorld().y*scale + d.body_a.get_v_at(d.aInWorld()).y*scale/30; });
+    .attr("x2", function(d) { return d.aInWorld().x*scale + d.body_a.get_v_at(d.aInWorld()).x*scale*timestep; })
+    .attr("y2", function(d) { return d.aInWorld().y*scale + d.body_a.get_v_at(d.aInWorld()).y*scale*timestep; });
    joints.selectAll("line.Bv")
     .attr("x1", function(d) { return d.bInWorld().x*scale; })
     .attr("y1", function(d) { return d.bInWorld().y*scale; })
-    .attr("x2", function(d) { return d.bInWorld().x*scale + d.body_b.get_v_at(d.bInWorld()).x*scale/30; })
-    .attr("y2", function(d) { return d.bInWorld().y*scale + d.body_b.get_v_at(d.bInWorld()).y*scale/30; });
+    .attr("x2", function(d) { return d.bInWorld().x*scale + d.body_b.get_v_at(d.bInWorld()).x*scale*timestep; })
+    .attr("y2", function(d) { return d.bInWorld().y*scale + d.body_b.get_v_at(d.bInWorld()).y*scale*timestep; });
   joints.selectAll("line.A")
     .attr("x1", function(d) { return d.body_a.s.x*scale; })
     .attr("y1", function(d) { return d.body_a.s.y*scale; })

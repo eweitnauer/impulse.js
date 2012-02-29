@@ -69,3 +69,14 @@ Body.prototype.get_v_at = function(s) {
   var r = s.sub(this.s);
   return new Point(this.v.x - r.y*this.w, this.v.y + r.x*this.w);
 }
+
+/// Returns the matrix describing how a impulse at the passed point will influence
+/// the speed in this point.
+Body.prototype.getK = function(point) {
+  if (!this.dynamic) return new Matrix();
+  var r = point.sub(this.s);
+  var m = this.inv_m;
+  var I = this.inv_I;
+  var bc = -I*r.x*r.y;
+  return new Matrix(m + I*r.y*r.y, bc, bc, m + I*r.x*r.x);
+}
