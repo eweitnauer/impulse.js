@@ -4,8 +4,8 @@ World = function() {
   this.gravity = new Point(0, 10)
   this.bodies = []
   this.joints = []
-  this.max_corr_it = 100;
-  this.max_vcorr_it = 100;
+  this.max_corr_it = 1000;
+  this.max_vcorr_it = 1000;
 }
 
 World.prototype.stepA = function(h) {
@@ -33,14 +33,20 @@ World.prototype.step = function(h) {
 World.prototype.jointPositionCorrection = function(h) {
   var iterations = 0;
   var change;
+  var last = Infinity;
   do {
-    iterations++;
     change = false;
+    var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      change = change || this.joints[i].correctPosition(h);
+      //change = change || this.joints[i].correctPosition(h);
+      now += this.joints[i].correctPosition(h);
     }
+    change = now<last;
+    last = now;
+    if (change) iterations++;
   } while (change && iterations<this.max_corr_it);
-  console.log(iterations);
+  //this.max_vcorr_it = iterations;
+  //console.log(iterations, last/this.joints.length);
   return change;
 }
 
@@ -49,14 +55,19 @@ World.prototype.jointPositionCorrection = function(h) {
 World.prototype.jointVelocityCorrection = function() {
   var iterations = 0;
   var change;
+  var last = Infinity;
   do {
-    change = false;
+    //change = false;
+    var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      change = change || this.joints[i].correctVelocity();
+      //change = change || this.joints[i].correctVelocity();
+      now += this.joints[i].correctVelocity();
     }
+    change = now<last;
+    last = now;
     if (change) iterations++;
   } while (change && iterations<this.max_vcorr_it);
-  console.log('v', iterations);
+  //console.log('v', iterations, last/this.joints.length);
   return change;
 }
 
