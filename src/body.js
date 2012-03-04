@@ -80,3 +80,9 @@ Body.prototype.getK = function(point) {
   var bc = -I*r.x*r.y;
   return new Matrix(m + I*r.y*r.y, bc, bc, m + I*r.x*r.x);
 }
+
+Body.prototype.getEnergy = function(gravity) {
+  var kin = 0.5*(1/this.inv_m)*this.v.len2() + 0.5*(1/this.inv_I)*this.w*this.w;
+  var pot = -(1/this.inv_m)*gravity.y*this.s.y
+  return  kin + pot;
+}

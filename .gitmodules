@@ -4,3 +4,6 @@
 [submodule "libs/geom.js"]
 	path = libs/geom.js
 	url = git@github.com:eweitnauer/geom.js.git
+[submodule "libs/box2d.js"]
+	path = libs/box2d.js
+	url = git://github.com/HBehrens/box2d.js.git
