@@ -22,8 +22,17 @@ World = function() {
   this.gravity = new Point(0, 10)
   this.bodies = []
   this.joints = []
-  this.max_corr_it = 1000;
-  this.max_vcorr_it = 1000;
+  this.max_corr_it = 1;
+  this.max_vcorr_it = 1;
+  this.initial_energy = null;
+}
+
+World.prototype.calcEnergy = function() {
+  var sum = 0;
+  for (var i=0; i<this.bodies.length; i++) {
+    sum += this.bodies[i].getEnergy(this.gravity);
+  }
+  return sum;
 }
 
 World.prototype.stepA = function(h) {
@@ -41,9 +50,11 @@ World.prototype.stepC = function(h) {
 }
 
 World.prototype.step = function(h) {
+  if (this.initial_energy == null) this.initial_energy = this.calcEnergy();
   this.stepA(h);
   this.stepB(h);
   this.stepC(h);
+  console.log(this.calcEnergy()-this.initial_energy);
 }
 
 /// For each joint, impulses are applied to its bodies, so they stay connected
@@ -52,6 +63,11 @@ World.prototype.jointPositionCorrection = function(h) {
   var iterations = 0;
   var change;
   var last = Infinity;
+  var now = 0;
+  for (var i=0; i<this.joints.length; i++) {
+    now += this.joints[i].getPositionError(h);
+  }
+  console.log('PositionCorrection starts with ', now);
   do {
     change = false;
     var now = 0;
@@ -61,6 +77,7 @@ World.prototype.jointPositionCorrection = function(h) {
     for (var i=0; i<this.joints.length; i++) {
       now += this.joints[i].getPositionError(h);
     }
+    console.log(now);
     change = now<last;
     last = now;
     if (change) iterations++;
