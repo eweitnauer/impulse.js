@@ -1,19 +1,22 @@
+/// Simulates a chain of sticks connected by ball joints.
+
+// physics parameters
 var world = new World();
-var w = 960,
-    h = 600,
-    r = 5,
+var N = 30,           // number of connected sticks (+ 1 that is fixed)
+    len = 1,          // object length is 1 m
+    mass = 1,         // object mass is 1 kg
+    I = 1/3*mass*len, // inertia of object (langer Stab)
+    timestep = 1/100, // simulation timestep: 10 ms
+    timer_id = null;
+
+// visualization parameters
+var w = 960,    // visualization width in pixels
+    h = 600,    // visualization height in pixels
+    r = 5,      // radius of joint visualization in pixels
     scale = 15, // 1 m in physic = 100 pixel in visualization
-    len = 1,
-    timestep = 1/100;
-var bodies, joints, v_bodies;
-var timer_id;
-
+    body_vis, joint_vis; // d3 selections holding the svg visualizations
+    
 function init() {
-  var mass = 1,
-      I = 1/3*mass*len; // Inertia eines langen Stabes
-      //I = 1/2*mass*r*r/scale/scale; // Inertia einer Kreisscheibe
-
-  var N = 30; // number of swinging bars
   var bs = [];
   bs.push(new Body(new Point(w/scale/2, len), new Point(), mass, 0, 0, I));
   bs[0].dynamic = false;
@@ -23,70 +26,41 @@ function init() {
     world.bodies.push(bs[i+1]);
     world.joints.push(new Joint(bs[i], new Point(0,len/2), bs[i+1], new Point(0,-len/2)));
   }
-    
-  show();
   
-  // stepA button
-  d3.select("body").append("a")
-    .text("JointCorr")
+  initVisualization();
+  addButtons();
+}
+
+function addButtons() {
+  // step button
+  d3.select("body").append("div").selectAll("a.button")
+    .data(["Play", "Step", "Stop Movement"])
+    .enter().append("a")
+    .text(function(d) { return d; })
     .attr("class", "button")
     .attr("href", "/")
     .on("click", function() {
         d3.event.preventDefault();
-        world.stepA(timestep);
-        update();
-     });
-  // stepB button
-  d3.select("body").append("a")
-    .text("Integrate")
-    .attr("class", "button")
-    .attr("href", "/")
-    .on("click", function() {
-        d3.event.preventDefault();
-        world.stepB(timestep);
-        update();
-     });
-  // stepC button
-  d3.select("body").append("a")
-    .text("JointVCorr")
-    .attr("class", "button")
-    .attr("href", "/")
-    .on("click", function() {
-        d3.event.preventDefault();
-        world.stepC(timestep);
-        update();
-     });
-  // reset speed button
-  d3.select("body").append("a")
-    .text("Reset Speed")
-    .attr("class", "button")
-    .attr("href", "/")
-    .on("click", function() {
-        d3.event.preventDefault();
-        world.stopMovement();
-        update();
-     });
-  // play button   
-  d3.select("body").append("a")
-    .text("Play")
-    .attr("class", "button")
-    .attr("href", "/")
-    .on("click", function() {
-        d3.event.preventDefault();
-        if (this.text == "Play") {
+        if (this.text == "Step") {
+          world.step(timestep);
+          update();
+        } else if (this.text == "Play") {
           this.innerHTML = "Pause";
           timer_id = setInterval(function() {
             world.step(timestep);
             update();
           }, 1000/100);
-        } else {
+        } else if (this.text == "Pause") {
           this.innerHTML = "Play";
           clearInterval(timer_id);
+        } else if (this.text == "Stop Movement") {
+          world.stopMovement();
+          update();
         }
      });
 }
 
-function show() {
+function initVisualization() {
   var colors = d3.scale.category10();
   var drag = d3.behavior.drag()
       .on("drag", dragmove);
@@ -96,21 +70,17 @@ function show() {
       .attr("height", h)
     
   svg.append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", w)
-    .attr("height", h)
+    .attr("x", 0).attr("y", 0).attr("width", w).attr("height", h)
     .attr("fill", "rgb(250,250,255)")
 
-
-  bodies = svg.selectAll("g.body")
+  body_vis = svg.selectAll("g.body")
         .data(world.bodies)
         .enter().append("g")
         .attr("class", "body")
 
-  bodies.call(drag);
+  body_vis.call(drag);
   
-  bodies.append("rect")
+  body_vis.append("rect")
         .attr("x", -4)
         .attr("y", -len/2*scale-r)
         .attr("width", 8)
@@ -120,17 +90,8 @@ function show() {
         .attr("stroke", function(d,i) { return colors(i); })
         .attr("fill", function(d,i) { return d3.hsl(colors(i)).brighter() } )
         .attr("stroke-width", "3px")
-
-//  bodies.append("line")
-//        .attr("x1", 0)
-//        .attr("y1", -len/2*scale)
-//        .attr("x2", 0)
-//        .attr("y2", len/2*scale)
-//        .attr("stroke", function(d,i) { return d3.hsl(colors(i)).brighter() } )
-//        .attr("stroke-linecap", "round")
-//        .attr("stroke-width", "4px")
   
-  joints = svg.selectAll("circle.joint")
+  joint_vis = svg.selectAll("circle.joint")
       .data(world.joints)
       .enter().append("circle")
       .attr("class", "joint")
@@ -149,38 +110,12 @@ function show() {
 }
 
 function update() {
-  bodies
-    .attr("transform", function(d) { return 'translate(' + d.s.x*scale + ',' + d.s.y*scale + ') rotate(' + 180/Math.PI*d.r + ")" })
-//    .attr("transform", function(d) { return "rotate(" + d.r + ")"})
-    
-  joints
+  body_vis
+    .attr("transform", function(d) {
+      return 'translate(' + d.s.x*scale + ',' + d.s.y*scale +
+             ') rotate(' + 180/Math.PI*d.r + ")" })
+             
+  joint_vis
     .attr("cx", function(d) { return d.aInWorld().x*scale; })
     .attr("cy", function(d) { return d.aInWorld().y*scale; })
-}
-
-/// Values might either be an array (then its values are used to label the
-/// buttons) or an integer (then its the number of elements and the buttons are
-/// labeled from 1 to values).
-/// The values of the buttons (which are passed to the callback function) run
-/// from 0 to (number_of_buttons-1) in the integer case or are the array values
-/// in the array case.
-/// Returns an array of the button <a> elements.
-function addButtons(div, values, callback) {
-  var use_labels = (typeof(values) !== 'number');
-  var l = use_labels ? values.length : values;
-  var btns = [];
-  for (var i=0; i<l; ++i) {
-    var a = document.createElement('a');
-    a.className = "button";
-    a.innerHTML = use_labels ? values[i] : i+1;
-    a.setAttribute('href', '/');
-    a.value = use_labels ? values[i] : i;
-    a.addEventListener("click", function(event) {
-      event.preventDefault();
-      callback(event.target.value, event.target);
-    }, false);
-    div.appendChild(a);
-    btns.push(a);
-  }
-  return btns;
 }
