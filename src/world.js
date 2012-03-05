@@ -18,12 +18,12 @@
 // TODO: Plot the engery of the chain over time to see if and how it changes
 // during simulation for different methods.
 
-World = function() {
-  this.gravity = new Point(0, 10)
+World = function(gravity, pos_it, vel_it) {
+  this.gravity = gravity || new Point(0, 10)
   this.bodies = []
   this.joints = []
-  this.max_corr_it = 10;
-  this.max_vcorr_it = 10;
+  this.max_corr_it = pos_it || 10;
+  this.max_vcorr_it = vel_it || 10;
   this.initial_energy = null;
 }
 
@@ -71,7 +71,7 @@ World.prototype.jointPositionCorrection = function(h) {
     change = false;
     var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      this.joints[i].correctPosition(h);
+      change = this.joints[i].correctPosition(h);
     }
     for (var i=0; i<this.joints.length; i++) {
       now += this.joints[i].getPositionError(h);
@@ -82,7 +82,7 @@ World.prototype.jointPositionCorrection = function(h) {
     if (change) iterations++;
   } while (change && iterations<this.max_corr_it);
   //this.max_vcorr_it = iterations;
-  //console.log(iterations, last/this.joints.length);
+//  console.log(iterations, last/this.joints.length);
   return change;
 }
 
