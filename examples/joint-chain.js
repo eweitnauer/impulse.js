@@ -1,7 +1,7 @@
 /// Simulates a chain of sticks connected by ball joints.
 
 // physics parameters
-var world = new World(new Point(0,10), 1, 1);
+var world = new World(new Point(0,10), 10, 10);
 var N = 30,           // number of connected sticks (+ 1 that is fixed)
     len = 1,          // object length is 1 m
     mass = 1,         // object mass is 1 kg
