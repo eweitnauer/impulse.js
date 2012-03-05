@@ -3,7 +3,7 @@
 // physics parameters
 
 var world = new b2World(new b2Vec2(0, 10), true);
-var N = 30,           // number of connected sticks (+ 1 that is fixed)
+var N = 100,           // number of connected sticks (+ 1 that is fixed)
     len = 1,          // object length is 1 m
     mass = 1,         // object mass is 1 kg
     I = 1/3*mass*len, // inertia of object (langer Stab)
@@ -17,7 +17,7 @@ var N = 30,           // number of connected sticks (+ 1 that is fixed)
 var w = 960,    // visualization width in pixels
     h = 600,    // visualization height in pixels
     r = 5,      // radius of joint visualization in pixels
-    scale = 15,  // 1 m in physic = x pixel in visualization
+    scale = 5,  // 1 m in physic = x pixel in visualization
     body_vis, joint_vis; // d3 selections holding the svg visualizations
 
 function init() {
