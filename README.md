@@ -1,6 +1,6 @@
-# physcis.js
+# impulse.js
 
-A 2D physics engine written in javascript based on the work of Jan Bender.
+An impulse based 2D physics engine written in javascript. The algorithms are
+based on the work of Jan Bender [www.impulse-based.de].
 
-
-Written by Erik Weitnauer, 2012.
+Erik Weitnauer, 2012.
