@@ -1,8 +1,8 @@
 /// Simulates a chain of sticks connected by ball joints.
 
 // physics parameters
-var world = new World(new Point(0,10), 5, 5);
-var N = 100,           // number of connected sticks (+ 1 that is fixed)
+var world = new World(new Point(0,10), 10, 10);
+var N = 25,           // number of connected sticks (+ 1 that is fixed)
     len = 1,          // object length is 1 m
     mass = 1,         // object mass is 1 kg
     I = 1/3*mass*len, // inertia of object (langer Stab)
@@ -13,16 +13,16 @@ var N = 100,           // number of connected sticks (+ 1 that is fixed)
 var w = 960,    // visualization width in pixels
     h = 600,    // visualization height in pixels
     r = 5,      // radius of joint visualization in pixels
-    scale = 5, // 1 m in physic = 100 pixel in visualization
+    scale = w/2/len/N*0.9, // 1 m in physic = x pixel in visualization
     body_vis, joint_vis; // d3 selections holding the svg visualizations
     
 function init() {
   var bs = [];
-  bs.push(new Body(new Point(w/scale/2, len), new Point(), mass, 0, 0, I));
+  bs.push(new Body(new Point(w/scale/2, h*0.05/scale), new Point(), mass, 0, 0, I));
   bs[0].dynamic = false;
   world.bodies.push(bs[0]);
   for (var i=0; i<N; i++) {
-    bs.push(new Body(new Point(w/scale/2 + (i+0.5)*len, len + len/2), new Point(), mass, -Math.PI*0.5, 0, I));
+    bs.push(new Body(new Point(w/scale/2 + (i+0.5)*len, h*0.05/scale + len/2), new Point(), mass, -Math.PI*0.5, 0, I));
     world.bodies.push(bs[i+1]);
     world.joints.push(new Joint(bs[i], new Point(0,len/2), bs[i+1], new Point(0,-len/2)));
   }
@@ -63,20 +63,26 @@ function addButtons() {
 function initVisualization() {
   var colors = d3.scale.category10();
   var drag = d3.behavior.drag()
-      .on("drag", dragmove);
+      .on("drag", dragmove)
+      .on("dragstart", function(d) { d.was_dynamic = d.dynamic; d.dynamic = false})
+      .on("dragend", function(d) {d.dynamic = d.was_dynamic})
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("body")
+      .style("background-color", "#444")
+      .append("svg")
       .attr("width", w)
       .attr("height", h)
     
   svg.append("rect")
     .attr("x", 0).attr("y", 0).attr("width", w).attr("height", h)
-    .attr("fill", "rgb(250,250,255)")
+//    .attr("fill", "rgb(250,250,255)")
+    .attr("fill", "#222")
 
   body_vis = svg.selectAll("g.body")
         .data(world.bodies)
         .enter().append("g")
         .attr("class", "body")
+        .on("click", function(d) {d.dynamic = !d.dynamic});
 
   body_vis.call(drag);
   
