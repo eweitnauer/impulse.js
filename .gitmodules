@@ -7,3 +7,6 @@
 [submodule "libs/box2d.js"]
 	path = libs/box2d.js
 	url = git://github.com/HBehrens/box2d.js.git
+[submodule "libs/box2d.js-kripken"]
+	path = libs/box2d.js-kripken
+	url = https://github.com/kripken/box2d.js.git

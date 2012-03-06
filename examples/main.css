@@ -5,10 +5,10 @@ svg {
 .button {
   font-family: Arial;
   text-align: center;
-  border: 2px solid #66E;
-  border-radius: 7px;
-  color: black;
-  background: #CCF;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  color: #ddd;
+  background: #222;
   display: inline-block;
   text-decoration: none;
   padding: 2px 4px;
@@ -16,10 +16,10 @@ svg {
 }
 
 .button:hover {
-  border: 2px solid #FFB351;
+  background: #555;
+  border: 1px solid #eee;  
 }
 
 .button.active {
-  border: 2px solid #FFB351;
-  background: #FFDFB9;
+  border: 1px solid #eee;
 }

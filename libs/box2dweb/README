@@ -1,0 +1,7 @@
+This is the box2dweb project, cloned with
+  svn checkout http://box2dweb.googlecode.com/svn/trunk/ box2dweb
+
+Current revision is 30.
+
+.svn directory is not checked into the git repository.
+
