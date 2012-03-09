@@ -2,8 +2,14 @@
 <html>
   <head>
     <title>Joint Test</title>
-    <link rel="stylesheet" href="main.css"/>
     <script src="../libs/d3/d3.v2.js"></script>
+    
+    <link href="../libs/jquery/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />	
+		<script src="../libs/jquery/js/jquery-1.7.1.min.js"></script>
+		<script src="../libs/jquery/js/jquery-ui-1.8.18.custom.min.js"></script>
+
+    <link rel="stylesheet" href="main.css"/>
+		
     <script src="../libs/geom.js/point.js"></script>
     <script src="../libs/geom.js/circle.js"></script>
 
@@ -15,5 +21,25 @@
     <script type="text/javascript" src="joint-chain.js"></script>
   </head>
   <body onload="init()">
+    <div id="simulation">
+		</div>
+		<div id="sidebar">
+		  <div id="sliders"></div>
+		  <p>stop correction when error...</p>
+		  <span id="stop_correction_on">
+    		<input type="radio" id="stop_on_conv" name="stop_on" checked="checked" /><label for="stop_on_conv">converged</label>
+    		<input type="radio" id="stop_on_worse" name="stop_on" /><label for="stop_on_worse">gets worse</label>
+    	</span>
+		</div>
+		<div class="center">
+  	<ul id="icons" class="ui-widget ui-helper-clearfix">
+  		<li id="play" title="start / pause simulation" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></li>
+		  <li id="step" title="single simulation step" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-seek-next"></span></li>
+  		<!--li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-stop"></span></li>
+  		<li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-eject"></span></li>
+  		<li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-power"></span></li-->
+		  <li id="stop_movement" title="stop all movement" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-arrowthickstop-1-s"></span></li>
+		</ul>
+		</div>
   </body>
 </html>

@@ -1,5 +1,10 @@
+body {
+  font-size: 9.5pt;
+  font-family: Segoe UI, Arial, sans-serif;
+}
+
 svg {
-  border: solid 1px #aaa;
+/*  border: solid 1px #aaa;*/
 }
 
 .button {
@@ -22,4 +27,75 @@ svg {
 
 .button.active {
   border: 1px solid #eee;
+}
+
+div.center {
+  width: 960px;
+  text-align: center;
+}
+
+.ui-widget {
+  font-size: 1em;
+}
+
+#sidebar p {
+  color: #ddd;
+  margin-top: 1em;
+  margin-bottom: 0.75em;
+  margin-left: 8px;
+}
+
+#sidebar span {
+  font-weight: bold;
+}
+
+.ui-slider {
+  margin: 0 8px;
+}
+
+div#simulation {
+  width: 960px;
+  height: 600px;
+  float: left;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #222;
+}
+
+div#sidebar {
+  float: left;
+  width: 250px;
+  height: 584px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-left: 8px;
+  padding: 8px;
+}
+
+div#sidebar:after {
+  clear: both;
+}
+
+/*hellblau: #59B4D4;*/
+
+ul#icons {
+  margin: 8px;
+  padding: 4px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+ul#icons li {
+  margin: 2px;
+  position: relative;
+  padding: 4px 0;
+  cursor: pointer;
+  float: left;
+  list-style: none;
+}
+
+ul#icons span.ui-icon {
+  float: left;
+  margin: 0 4px;
 }
