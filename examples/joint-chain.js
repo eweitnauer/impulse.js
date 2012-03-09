@@ -9,6 +9,30 @@ var N = 25,           // number of connected sticks (+ 1 that is fixed)
     timestep = 1/100, // simulation timestep: 10 ms
     timer_id = null;
 
+var params = {
+  N: {value: 25, range: [1,100], label: "number of objects"}
+ ,timestep: {values: [1, 5, 10, 20, 40, 100], idx: 2, postfix:" ms"}
+ ,mass: {values: [0.001,0.01,0.1,1,10], idx: 3, postfix: " kg"}
+ ,inertia: {values: [0.001,0.01,0.1,0.33,1,10], idx: 3, postfix: " kg*m^2"}
+ ,max_err: {values: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001], idx: 2}
+ ,max_verr: {values: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001], idx: 2}
+ ,corr_steps: {label: "max. corr. steps", values: [1,2,3,4,5,10,50,100,1000,10000], idx: 5}
+ ,vcorr_steps: {label: "max. v-corr. steps", values: [1,2,3,4,5,10,50,100,1000,10000], idx: 5}
+ ,p_factor: {value: 1, range: [0.5, 2], step: 0.1, label: "correction impulse factor"}
+ }
+  
+function create_param_array() {
+  var a = [];
+  for (var id in params) {
+    var p = params[id];
+    p.id = id;
+    a.push(p);
+  }
+  return a;
+}
+
+var param_array = create_param_array();
+
 // visualization parameters
 var w = 960,    // visualization width in pixels
     h = 600,    // visualization height in pixels
@@ -53,30 +77,19 @@ function addControls() {
     update();
   });
   
-  var parameters = [
-    {id: "N", label: "number of objects", min: 1, max: 100, value: 25}
-   ,{id: "mass", min: 0, max: 4, value: 3, map: [0.001,0.01,0.1,1,10], postfix: " kg"}
-   ,{id: "inertia", min: 0, max: 5, value: 3, map: [0.001,0.01,0.1,0.33,1,10], postfix: " kg*m^2"}
-   ,{id: "err", label: "max. error", min: 0, max: 5, value: 2, map: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001]}
-   ,{id: "verr", label: "max. v-error", min: 0, max: 5, value: 2, map: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001]}
-   ,{id: "corr_steps", label: "max. corr. steps", min: 0, max: 9, value: 5, map: [1,2,3,4,5,10,50,100,1000,10000]}
-   ,{id: "vcorr_steps", label: "max. v-corr. steps", min: 0, max: 9, value: 5, map: [1,2,3,4,5,10,50,100,1000,10000]}
-   ,{id: "p_factor", label: "correction impulse factor", min: 0.5, max: 2, value: 1, step: 0.1}
-  ]
-
   function update_params() {
     d3.selectAll("div.parameter")
-      .data(parameters)
+      .data(param_array)
       .select("span")
       .text(function(d) { 
-        var val = ('map' in d) ? d.map[d.value] : d.value;
+        var val = ('values' in d) ? d.values[d.idx] : d.value;
         var str = ('postfix' in d) ? d.postfix : '';
         return val + str;
       });
   }
   
   var divs = d3.select("#sliders").selectAll("div.parameter")
-    .data(parameters).enter()
+    .data(param_array).enter()
     .append("div")
     .attr("class", "parameter");
   
@@ -88,8 +101,14 @@ function addControls() {
     .attr("id", function(d) { return d.id })
     .each(function(d) {
       $("#"+d.id).slider({
-        min: d.min, max: d.max, value: d.value, step: (d.step || 1),
-        slide: function(evt, ui) { d.value = ui.value; update_params(); }
+        min: 'range' in d ? d.range[0] : 0
+       ,max: 'range' in d ? d.range[1] : d.values.length-1
+       ,value: 'idx' in d ? d.idx : d.value
+       ,step: (d.step || 1)
+       ,slide: function(evt, ui) {
+          if ('value' in d) d.value = ui.value;
+          else d.idx = ui.value;
+          update_params(); }
       });
       update_params();
     });
