@@ -53,7 +53,7 @@ World.prototype.step = function(h) {
   this.stepA(h);
   this.stepB(h);
   this.stepC(h);
-  console.log("Energy difference to start:", this.calcEnergy()-this.initial_energy);
+  //console.log("Energy difference to start:", this.calcEnergy()-this.initial_energy);
 }
 
 /// For each joint, impulses are applied to its bodies, so they stay connected
