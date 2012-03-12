@@ -12,7 +12,7 @@ var params = {
  ,max_verr: {value: 0.001, values: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001], postfix: " m/s", label:"vel. error epsilon", type: 'number'}
  ,corr_steps: {value: 5, label: "max. pos. corr. steps", values: [1,2,3,4,5,10,50,100,1000,10000], type: 'number'}
  ,vcorr_steps: {value: 5, label: "max. vel. corr. steps", values: [1,2,3,4,5,10,50,100,1000,10000], type: 'number'}
- ,p_factor: {value: 1.5, range: [0.5, 2], step: 0.1, label: "scaling of correction impulses", type: 'number'}
+ ,p_factor: {value: 1.0, range: [0.1, 1.9], step: 0.1, label: "scaling of correction impulses", type: 'number'}
  ,corr_mode: {value: 'below epsilon', label: "stop corr. when error", values: ['below epsilon', 'gets worse'], type: 'number'}
 }
 
@@ -22,7 +22,7 @@ var timer_id;
 
 // visualization parameters
 var w = 960,    // visualization width in pixels
-    h = 600,    // visualization height in pixels
+    h = 580,    // visualization height in pixels
     r = 0.2,    // radius of joint visualization in meter
     scale = w/2/len/params.N.value*0.9; // 1 m in physic = x pixel in visualization
 
@@ -98,7 +98,7 @@ function update_params() {
   world.max_vcorr_it = params.vcorr_steps.value;
   
   // stop on...
-  world.stop_corr_on_worse = $('#stop_on_worse')[0].checked;
+  world.stop_corr_on_worse = params.corr_mode.value == 'gets worse';
   
   update();
 }
@@ -176,7 +176,7 @@ function update() {
   var N = params.N.value;
   
   bs.attr("transform", function(d) {
-           return 'translate(' + (s*d.s.x+w/2) + ',' + s*(d.s.y+len) + ') ' +
+           return 'translate(' + (s*d.s.x+w/2) + ',' + s*(d.s.y+len*0.8) + ') ' +
                   'rotate(' + 180/Math.PI*d.r + ') '})
     .attr("stroke", N>20 ? "none" : function(d,i)
          { return d.dynamic ? colors(i) : "#eee" })
@@ -185,5 +185,5 @@ function update() {
 
   js.style("display", N>20 ? "none" : null)
     .attr("cx", function(d) { return d.aInWorld().x*s+w/2; })
-    .attr("cy", function(d) { return d.aInWorld().y*s+s*len; });
+    .attr("cy", function(d) { return d.aInWorld().y*s+s*len*0.8; });
 }

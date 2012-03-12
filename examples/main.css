@@ -2,37 +2,26 @@ body {
   font-size: 9.5pt;
   font-family: Segoe UI, Arial, sans-serif;
   background-color: #444;
+  margin: 0;
+  padding: 0;
 }
 
-svg {
-/*  border: solid 1px #aaa;*/
+#header {
+  border-bottom: 4px solid #888;
 }
 
-.button {
-  font-family: Arial;
-  text-align: center;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  color: #ddd;
-  background: #222;
-  display: inline-block;
-  text-decoration: none;
-  padding: 2px 4px;
-  margin: 6px;
+#header h1 {
+  font-size: 30px;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  font-style: italic;
+  margin: 10px 0 6px 32px;
+  color: #59B4D4;
+  text-shadow: #000 1px 1px 1px;
 }
 
-.button:hover {
-  background: #555;
-  border: 1px solid #eee;  
-}
-
-.button.active {
-  border: 1px solid #eee;
-}
-
-div.center {
-  width: 960px;
-  text-align: center;
+#main {
+  padding: 8px;
 }
 
 .ui-widget {
@@ -66,7 +55,7 @@ div.center {
 
 div#simulation {
   width: 960px;
-  height: 600px;
+  height: 580px;
   float: left;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -75,15 +64,19 @@ div#simulation {
 
 #sidebar {
   float: left;
-  width: 250px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-left: 8px;
-  padding: 8px;
+  padding-left: 8px;
 }
 
 #sidebar:after {
   clear: both;
+}
+
+#parameters {
+  width: 250px;
+  border-radius: 6px;
+  border-bottom-left-radius: 0;
+  border: 1px solid #ccc;
+  padding: 8px;
 }
 
 #sidebar h1 {
@@ -103,12 +96,10 @@ ul#icons {
   padding: 4px;
   display: inline-block;
   border: 1px solid #ccc;
-  border-bottom: none;
+  border-top: none;
   border-radius: 6px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
-  position: relative;
-  top: -40px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 }
 
 ul#icons li {
@@ -123,4 +114,26 @@ ul#icons li {
 ul#icons span.ui-icon {
   float: left;
   margin: 0 4px;
+}
+
+.button {
+  font-family: Arial;
+  text-align: center;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  color: #ddd;
+  background: #222;
+  display: inline-block;
+  text-decoration: none;
+  padding: 2px 4px;
+  margin: 6px;
+}
+
+.button:hover {
+  background: #555;
+  border: 1px solid #eee;  
+}
+
+.button.active {
+  border: 1px solid #eee;
 }

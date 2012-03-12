@@ -140,9 +140,5 @@ function addParamControls(parent_element, params, update_fn) {
     });
  
   update_params();
-
-	$("#stop_correction_on").buttonset();
-	$("#stop_on_worse").bind("click", update_fn);
-	$("#stop_on_conv").bind("click", update_fn);
 };
 
