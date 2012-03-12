@@ -1,127 +1,189 @@
+/// Written by Erik Weitnauer, 2012.
 /// Simulates a chain of sticks connected by ball joints.
 
-// physics parameters
-var world = new World(new Point(0,10), 10, 10);
-var N = 25,           // number of connected sticks (+ 1 that is fixed)
-    len = 1,          // object length is 1 m
-    mass = 1,         // object mass is 1 kg
-    I = 1/3*mass*len, // inertia of object (langer Stab)
-    timestep = 1/100, // simulation timestep: 10 ms
-    timer_id = null;
+// simulation parameters
+var params = {
+  N: {value: 10, range: [1,100], label: "chain segments", type: 'number'}
+ ,len: {value: 1, postfix: " m", type: 'fixed', label:"length"}
+ ,mass: {value: 1, postfix: " kg", type: 'fixed'}
+ ,inertia: {value: 0.33, values: [0.001,0.01,0.1,0.33,1,10], postfix: " kg*m^2", type: 'number'}
+ ,timestep: {value: 10, values: [1, 5, 10, 20, 40, 100], postfix:" ms", type: 'number'}
+ ,max_err: {value: 0.001, values: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001], postfix: " m", label:"pos. error epsilon", type: 'number'}
+ ,max_verr: {value: 0.001, values: [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001], postfix: " m/s", label:"vel. error epsilon", type: 'number'}
+ ,corr_steps: {value: 5, label: "max. pos. corr. steps", values: [1,2,3,4,5,10,50,100,1000,10000], type: 'number'}
+ ,vcorr_steps: {value: 5, label: "max. vel. corr. steps", values: [1,2,3,4,5,10,50,100,1000,10000], type: 'number'}
+ ,p_factor: {value: 1.0, range: [0.1, 1.9], step: 0.1, label: "scaling of correction impulses", type: 'number'}
+ ,corr_mode: {value: 'below epsilon', label: "stop corr. when error", values: ['below epsilon', 'gets worse'], type: 'number'}
+}
+
+var len = 1; // each body has a length of 1 m
+var world = new World(new Point(0,10), params.corr_steps.value, params.vcorr_steps.value);
+var timer_id;
 
 // visualization parameters
 var w = 960,    // visualization width in pixels
-    h = 600,    // visualization height in pixels
-    r = 5,      // radius of joint visualization in pixels
-    scale = w/2/len/N*0.9, // 1 m in physic = x pixel in visualization
-    body_vis, joint_vis; // d3 selections holding the svg visualizations
-    
+    h = 580,    // visualization height in pixels
+    r = 0.2,    // radius of joint visualization in meter
+    scale = w/2/len/params.N.value*0.9; // 1 m in physic = x pixel in visualization
+
+/// called on page load
 function init() {
-  var bs = [];
-  bs.push(new Body(new Point(w/scale/2, h*0.05/scale), new Point(), mass, 0, 0, I));
-  bs[0].dynamic = false;
-  world.bodies.push(bs[0]);
-  for (var i=0; i<N; i++) {
-    bs.push(new Body(new Point(w/scale/2 + (i+0.5)*len, h*0.05/scale + len/2), new Point(), mass, -Math.PI*0.5, 0, I));
-    world.bodies.push(bs[i+1]);
-    world.joints.push(new Joint(bs[i], new Point(0,len/2), bs[i+1], new Point(0,-len/2)));
-  }
-  
   initVisualization();
-  addButtons();
+  
+  addSimulationControls(play, pause, step, stop_movement);
+  
+  addParamControls("#sliders", params, update_params);  
 }
 
-function addButtons() {
-  // step button
-  d3.select("body").append("div").selectAll("a.button")
-    .data(["Play", "Step", "Stop Movement"])
-    .enter().append("a")
-    .text(function(d) { return d; })
-    .attr("class", "button")
-    .attr("href", "/")
-    .on("click", function() {
-        d3.event.preventDefault();
-        if (this.text == "Step") {
-          world.step(timestep);
-          update();
-        } else if (this.text == "Play") {
-          this.innerHTML = "Pause";
-          timer_id = setInterval(function() {
-            world.step(timestep);
-            update();
-          }, 1000/100);
-        } else if (this.text == "Pause") {
-          this.innerHTML = "Play";
-          clearInterval(timer_id);
-        } else if (this.text == "Stop Movement") {
-          world.stopMovement();
-          update();
-        }
-     });
-}
-
+/// appends svg element and global g for transformation
 function initVisualization() {
-  var colors = d3.scale.category10();
-  var drag = d3.behavior.drag()
-      .on("drag", dragmove)
-      .on("dragstart", function(d) { d.was_dynamic = d.dynamic; d.dynamic = false})
-      .on("dragend", function(d) {d.dynamic = d.was_dynamic})
+  var svg = d3.select("#simulation")
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h);
+}
 
-  var svg = d3.select("body")
-      .style("background-color", "#444")
-      .append("svg")
-      .attr("width", w)
-      .attr("height", h)
-    
-  svg.append("rect")
-    .attr("x", 0).attr("y", 0).attr("width", w).attr("height", h)
-//    .attr("fill", "rgb(250,250,255)")
-    .attr("fill", "#222")
-
-  body_vis = svg.selectAll("g.body")
-        .data(world.bodies)
-        .enter().append("g")
-        .attr("class", "body")
-        .on("click", function(d) {d.dynamic = !d.dynamic});
-
-  body_vis.call(drag);
-  
-  body_vis.append("rect")
-        .attr("x", -4)
-        .attr("y", -len/2*scale-r)
-        .attr("width", 8)
-        .attr("height", len*scale+2*r)
-        .attr("rx", 3)
-        .attr("ry", 3)
-        .attr("stroke", function(d,i) { return colors(i); })
-        .attr("fill", function(d,i) { return d3.hsl(colors(i)).brighter() } )
-        .attr("stroke-width", "3px")
-  
-  joint_vis = svg.selectAll("circle.joint")
-      .data(world.joints)
-      .enter().append("circle")
-      .attr("class", "joint")
-      .attr("fill", "gray")
-      .attr("stroke", "black")
-      .attr("stroke-width", "2px")
-      .attr("r", r-2);
-
-  update();
-  
-  function dragmove(d, i) {
-    d.s.x = Math.max(r, Math.min(w - r, d3.event.x))/scale;
-    d.s.y = Math.max(r, Math.min(h - r, d3.event.y))/scale;
+function play() {
+  timer_id = setInterval(function() {
+    world.step(params.timestep.value/1000);
     update();
+  }, params.timestep.value);
+}
+
+function pause() {
+  clearInterval(timer_id);
+}
+
+function step() {
+  world.step(params.timestep.value/1000);
+  update();
+}
+
+function stop_movement() {
+  world.stopMovement();
+  update();
+}
+
+var param_array = create_param_array(params);
+
+var colors = d3.scale.category10();
+
+function update_params() {
+  // apply parameter values to the simulation
+  // body count should be N+1 (the 1 is the static body at the top)
+  var N = params.N.value;
+  var N_changed = world.bodies.length != N+1;
+  while (world.bodies.length < N+1) addBody();
+  if (world.bodies.length > N+1) {
+    world.bodies.splice(N+1);
+    world.joints.splice(N);
   }
+  if (N_changed) updateN();
+    
+  // mass, inertia
+  world.bodies.forEach(function(body) {
+    body.inv_m = 1/params.mass.value;
+    body.inv_I = 1/params.inertia.value;  
+  });
+  
+  // max_err, max_verr, p_factor
+  world.joints.forEach(function(joint) {
+    joint.eps_pos = params.max_err.value;
+    joint.eps_vel = params.max_verr.value;
+    joint.p_factor = params.p_factor.value;
+  });
+  
+  // corr_steps, vcorr_steps
+  world.max_corr_it = params.corr_steps.value;
+  world.max_vcorr_it = params.vcorr_steps.value;
+  
+  // stop on...
+  world.stop_corr_on_worse = params.corr_mode.value == 'gets worse';
+  
+  update();
+}
+
+/// Adds one body to the chain. If its not the first one, it gets connected with
+/// a ball joint to the last body.
+function addBody() {
+  // is this the first body in the scene?
+  if (world.bodies.length == 0) {
+    // yes, so make it static
+    var b = new Body(new Point(0, 0), new Point(0, 0),
+                     params.mass.value, 0, 0, params.inertia.value);
+    b.dynamic = false;
+    world.bodies.push(b);
+  } else {
+    // not first body, make it dynamic and link to last body by a ball joint
+    var a = world.bodies[world.bodies.length-1];
+    var pos = a.to_world(new Point(0,len/2));
+    pos.x += len/2;
+    var b = new Body(pos, new Point(), params.mass.value, -Math.PI*0.5, 0, params.inertia.value);
+    world.bodies.push(b);
+    world.joints.push(new Joint(a, new Point(0,len/2), b, new Point(0,-len/2)));  
+  }
+}
+
+function dragmove(d, i) {
+  var s = w/2/len/(params.N.value+1);
+  d.s.x += d3.event.dx/s;
+  d.s.y += d3.event.dy/s;
+  update();
+}
+
+var drag_body = d3.behavior.drag()
+  .on("drag", dragmove)
+  .on("dragstart", function(d) { d.was_dynamic = d.dynamic; d.dynamic = false; update();})
+  .on("dragend", function(d) {d.dynamic = d.was_dynamic; update();})
+
+var bs, js;
+
+function updateN() {
+  bs = d3.select("svg").selectAll("rect.body").data(world.bodies);
+  var s = w/2/len/(params.N.value+1);
+  var N = params.N.value;
+  
+  bs.exit().remove();
+
+  bs.enter().append("rect")
+    .on("click", function(d,i) { d.dynamic = !d.dynamic; update(); })
+    .attr("class", "body")
+    .call(drag_body);
+  
+  bs.attr("x", Math.min(-1,s*(-r/2)))
+    .attr("y", s*(-len/2-r/2))
+    .attr("width", Math.max(2,s*r))
+    .attr("height", s*(len+r))
+    .attr("rx", N>20 ? null : s*r/2)
+    .attr("ry", N>20 ? null : s*r/2)
+    .attr("stroke-width", s*r/4)
+  
+  js = d3.select("svg").selectAll("circle.joint").data(world.joints);
+  
+  js.exit().remove();
+  
+  js.enter().append("circle")
+    .attr("class", "joint")
+    .attr("fill", "gray")
+    .attr("stroke", "black");
+    
+  js.attr("stroke-width", s*r/4)
+    .attr("r", s*r/4);
 }
 
 function update() {
-  body_vis
-    .attr("transform", function(d) {
-      return 'translate(' + d.s.x*scale + ',' + d.s.y*scale +
-             ') rotate(' + 180/Math.PI*d.r + ")" })
-             
-  joint_vis
-    .attr("cx", function(d) { return d.aInWorld().x*scale; })
-    .attr("cy", function(d) { return d.aInWorld().y*scale; })
+  var s = w/2/len/(params.N.value+1);
+  var N = params.N.value;
+  
+  bs.attr("transform", function(d) {
+           return 'translate(' + (s*d.s.x+w/2) + ',' + s*(d.s.y+len*0.8) + ') ' +
+                  'rotate(' + 180/Math.PI*d.r + ') '})
+    .attr("stroke", N>20 ? "none" : function(d,i)
+         { return d.dynamic ? colors(i) : "#eee" })
+    .attr("fill", function(d,i)
+         { return d.dynamic ? d3.hsl(colors(i)).brighter() : "#eee" })
+
+  js.style("display", N>20 ? "none" : null)
+    .attr("cx", function(d) { return d.aInWorld().x*s+w/2; })
+    .attr("cy", function(d) { return d.aInWorld().y*s+s*len*0.8; });
 }

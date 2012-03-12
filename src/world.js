@@ -24,6 +24,7 @@ World = function(gravity, pos_it, vel_it) {
   this.joints = []
   this.max_corr_it = pos_it || 10;
   this.max_vcorr_it = vel_it || 10;
+  this.stop_corr_on_worse = true;
   this.initial_energy = null;
 }
 
@@ -53,7 +54,7 @@ World.prototype.step = function(h) {
   this.stepA(h);
   this.stepB(h);
   this.stepC(h);
-  console.log("Energy difference to start:", this.calcEnergy()-this.initial_energy);
+  //console.log("Energy difference to start:", this.calcEnergy()-this.initial_energy);
 }
 
 /// For each joint, impulses are applied to its bodies, so they stay connected
@@ -71,18 +72,18 @@ World.prototype.jointPositionCorrection = function(h) {
     change = false;
     var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      change = this.joints[i].correctPosition(h);
+      change = this.joints[i].correctPosition(h) || change;
     }
     for (var i=0; i<this.joints.length; i++) {
       now += this.joints[i].getPositionError(h);
     }
     //console.log(now);
-    change = now<last;
+    if (this.stop_corr_on_worse) change = now<last;
     last = now;
     if (change) iterations++;
   } while (change && iterations<this.max_corr_it);
   //this.max_vcorr_it = iterations;
-//  console.log(iterations, last/this.joints.length);
+  //console.log(iterations);//, last/this.joints.length);
   return change;
 }
 
@@ -96,16 +97,16 @@ World.prototype.jointVelocityCorrection = function() {
     change = false;
     var now = 0;
     for (var i=0; i<this.joints.length; i++) {
-      this.joints[i].correctVelocity();
+      change = this.joints[i].correctVelocity() || change;
     }
     for (var i=0; i<this.joints.length; i++) {
       now += this.joints[i].getVelocityError();
     }
-    change = now<last;
+    if (this.stop_corr_on_worse) change = now<last;
     last = now;
     if (change) iterations++;
   } while (change && iterations<this.max_vcorr_it);
-  //console.log('v', iterations, last/this.joints.length);
+  //console.log('v', iterations)//, last/this.joints.length);
   return change;
 }
 

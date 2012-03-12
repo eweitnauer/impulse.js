@@ -2,8 +2,15 @@
 <html>
   <head>
     <title>Joint Test</title>
-    <link rel="stylesheet" href="main.css"/>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700italic' rel='stylesheet' type='text/css'>
     <script src="../libs/d3/d3.v2.js"></script>
+    
+    <link href="../libs/jquery/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />	
+		<script src="../libs/jquery/js/jquery-1.7.1.min.js"></script>
+		<script src="../libs/jquery/js/jquery-ui-1.8.18.custom.min.js"></script>
+
+    <link rel="stylesheet" href="main.css"/>
+		
     <script src="../libs/geom.js/point.js"></script>
     <script src="../libs/geom.js/circle.js"></script>
 
@@ -12,8 +19,33 @@
     <script src="../src/joint.js"></script>
     <script src="../src/math.js"></script>
 
+    <script type="text/javascript" src="interface.js"></script>
     <script type="text/javascript" src="joint-chain.js"></script>
   </head>
   <body onload="init()">
+   <a href="http://github.com/eweitnauer/impulse.js">
+    <img style="position: absolute; top: 0; right: 0; border: 0;" src="imgs/fork_me_gray.png" alt="Fork me on GitHub">
+   </a>
+    <div id="header">
+      <h1>impulse.js</h1>
+    </div>
+    <div id="main">
+    <div id="simulation">
+		</div>
+		<div id="sidebar">
+  		<div id="parameters">
+		    <h1>Simulation Parameters</h1>
+		    <p class='comment'>blue numbers can be dragged<p>
+		    <div id="sliders"></div>
+		  </div>
+  		<div class="center">
+    	<ul id="icons" class="ui-widget ui-helper-clearfix">
+    		<li id="play" title="start / pause simulation" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></li>
+	  	  <li id="step" title="single simulation step" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-seek-next"></span></li>
+	  	  <li id="stop_movement" title="stop all movement" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-arrowthickstop-1-s"></span></li>
+	  	</ul>
+	  	</div>
+	  </div>
+	  </div>
   </body>
 </html>

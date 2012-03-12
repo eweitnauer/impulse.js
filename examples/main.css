@@ -1,5 +1,119 @@
-svg {
-  border: solid 1px #aaa;
+body {
+  font-size: 9.5pt;
+  font-family: Segoe UI, Arial, sans-serif;
+  background-color: #444;
+  margin: 0;
+  padding: 0;
+}
+
+#header {
+  border-bottom: 4px solid #888;
+}
+
+#header h1 {
+  font-size: 30px;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  font-style: italic;
+  margin: 10px 0 6px 32px;
+  color: #59B4D4;
+  text-shadow: #000 1px 1px 1px;
+}
+
+#main {
+  padding: 8px;
+}
+
+.ui-widget {
+  font-size: 1em;
+}
+
+#sidebar p {
+  color: #ddd;
+  margin-top: 1em;
+  margin-bottom: 0.75em;
+  margin-left: 8px;
+}
+
+#sidebar span {
+  font-weight: bold;
+}
+
+#sidebar span.changable{
+  color: #59B4D4;
+  background: #333;
+  display: inline-block;
+  padding: 0 3px;
+}
+
+#sidebar span.active{
+  color: #ffaf0f;
+}
+.ui-slider {
+  margin: 0 8px;
+}
+
+div#simulation {
+  width: 960px;
+  height: 580px;
+  float: left;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #222;
+}
+
+#sidebar {
+  float: left;
+  padding-left: 8px;
+}
+
+#sidebar:after {
+  clear: both;
+}
+
+#parameters {
+  width: 250px;
+  border-radius: 6px;
+  border-bottom-left-radius: 0;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+#sidebar h1 {
+  font-size: 1.4em;
+  margin: 0.2em 0;
+  color: #DDD;
+}
+
+#sidebar .comment {
+  margin-top: -0.4em;
+  text-align: right;
+  color: #888;
+}
+
+ul#icons {
+  margin: 0;
+  padding: 4px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 6px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+ul#icons li {
+  margin: 2px;
+  position: relative;
+  padding: 4px 0;
+  cursor: pointer;
+  float: left;
+  list-style: none;
+}
+
+ul#icons span.ui-icon {
+  float: left;
+  margin: 0 4px;
 }
 
 .button {
