@@ -1,6 +1,7 @@
 body {
   font-size: 9.5pt;
   font-family: Segoe UI, Arial, sans-serif;
+  background-color: #444;
 }
 
 svg {
@@ -49,6 +50,16 @@ div.center {
   font-weight: bold;
 }
 
+#sidebar span.changable{
+  color: #59B4D4;
+  background: #333;
+  display: inline-block;
+  padding: 0 3px;
+}
+
+#sidebar span.active{
+  color: #ffaf0f;
+}
 .ui-slider {
   margin: 0 8px;
 }
@@ -62,28 +73,42 @@ div#simulation {
   background: #222;
 }
 
-div#sidebar {
+#sidebar {
   float: left;
   width: 250px;
-  height: 584px;
   border-radius: 6px;
   border: 1px solid #ccc;
   margin-left: 8px;
   padding: 8px;
 }
 
-div#sidebar:after {
+#sidebar:after {
   clear: both;
 }
 
-/*hellblau: #59B4D4;*/
+#sidebar h1 {
+  font-size: 1.4em;
+  margin: 0.2em 0;
+  color: #DDD;
+}
+
+#sidebar .comment {
+  margin-top: -0.4em;
+  text-align: right;
+  color: #888;
+}
 
 ul#icons {
-  margin: 8px;
+  margin: 0;
   padding: 4px;
   display: inline-block;
   border: 1px solid #ccc;
+  border-bottom: none;
   border-radius: 6px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  position: relative;
+  top: -40px;
 }
 
 ul#icons li {
