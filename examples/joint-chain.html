@@ -2,7 +2,8 @@
 <html>
   <head>
     <title>Joint Test</title>
-    <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,400italic,500italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:700italic' rel='stylesheet' type='text/css'>
     <script src="../libs/d3/d3.v2.js"></script>
     
     <link href="../libs/jquery/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />	
@@ -26,10 +27,12 @@
    <a href="http://github.com/eweitnauer/impulse.js">
     <img style="position: absolute; top: 0; right: 0; border: 0;" src="imgs/fork_me_gray.png" alt="Fork me on GitHub">
    </a>
-    <div id="header">
-      <h1>impulse.js</h1>
+    <div id="header" class="clearfix">
+      <span id="title">impulse.js</span>
+      <span id="title-line">An impulse-based 2D physics engine in javascript inspired by <a href="http://www.impulse-based.de/">IBDS</a>.</span>
     </div>
-    <div id="main">
+
+    <div id="main" class="clearfix">
     <div id="simulation">
 		</div>
 		<div id="sidebar">
