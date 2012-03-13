@@ -97,13 +97,15 @@ function addParamControls(parent_element, params, update_fn) {
       }
     })
    .on("dragstart", function(d) {
-      d3.select(this).classed('active', true);
       d3.event.sourceEvent.preventDefault();
+      d3.select(this).classed('active', true);
+      d3.select("body").style("cursor", "ew-resize");
       this.__dx__ = 0;
     })
    .on("dragend", function(d) {
-      d3.select(this).classed('active', false);
       d3.event.sourceEvent.preventDefault();
+      d3.select(this).classed('active', false);
+      d3.select("body").style("cursor", null);
       delete this.__dx__;
     });
 

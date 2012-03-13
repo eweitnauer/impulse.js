@@ -24,6 +24,12 @@ body {
   padding: 8px;
 }
 
+div#main:after {
+  clear: both;
+  display: block;
+  content: "";
+}
+
 .ui-widget {
   font-size: 1em;
 }
