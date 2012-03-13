@@ -8,7 +8,7 @@ body {
 
 #header {
   border-bottom: 4px solid #888;
-  padding: 4px;
+  padding: 6px;
 }
 
 #header a {
@@ -22,35 +22,26 @@ body {
   border-bottom: 1px dashed white;
 }
 
-#header h1 {
-  font-size: 30px;
-  font-family: 'Ubuntu', sans-serif;
-  font-weight: bold;
-  font-style: italic;
-  margin: 10px 0 6px 32px;
-  color: #59B4D4;
-  text-shadow: #000 1px 1px 1px;
-  float: left;
-}
-
 #title {
   font-size: 32px;
-  font-family: 'Ubuntu Mono', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-style: italic;
   color: #59B4D4;
   text-shadow: #222 1px 1px 1px;
-  vertical-align: baseline;
-  margin-left: 32px;
-  margin-right: 16px;
+  margin-left: 30px;
 }
 
 #title-line {
   font-size: 14px;
-  font-family: 'Ubuntu Mono', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
+  font-style: italic;
+  font-weight: bold;
   color: #ccc;
   text-shadow: #333 1px 1px 1px;
-  vertical-align: baseline;
+  display: block;
+  margin-left: 30px;
+  margin-top: 10px;
 }
 
 #header p {
