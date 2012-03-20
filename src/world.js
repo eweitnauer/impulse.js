@@ -15,9 +15,6 @@
 // TODO: Implement the LGS-method that solves a linear equations system to
 // correct the joints.
 
-// TODO: Plot the engery of the chain over time to see if and how it changes
-// during simulation for different methods.
-
 World = function(gravity, pos_it, vel_it) {
   this.gravity = gravity || new Point(0, 10)
   this.bodies = []
@@ -26,6 +23,9 @@ World = function(gravity, pos_it, vel_it) {
   this.max_vcorr_it = vel_it || 10;
   this.stop_corr_on_worse = true;
   this.initial_energy = null;
+  
+  // two objects may overlap no more than eps_coll on contact or collision
+  this.eps_coll = 0.001;
 }
 
 World.prototype.calcEnergy = function() {
