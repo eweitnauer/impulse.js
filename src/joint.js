@@ -1,12 +1,12 @@
 /// Copyright by Erik Weitnauer, 2012.
-/// Ein Kugelgelenk (-2 Translationsfreiheitsgrade).
+/// Ball joint (-2 translational degrees of freedom).
 
 /// Constructor. pos_a is local for body_a, pos_b local for body_b.
-Joint = function(body_a, pos_a, body_b, pos_b) {
+Joint = function(body_a, body_b, pos) {
   this.body_a = body_a;
   this.body_b = body_b;
-  this.pos_a = pos_a;
-  this.pos_b = pos_b;
+  this.pos_a = body_a.to_local(pos);
+  this.pos_b = body_b.to_local(pos);
   this.eps_pos = 1e-3;
   this.eps_vel = 1e-3;
   this.p_factor = 1.0; // the correct correction impulse is multiplied by this

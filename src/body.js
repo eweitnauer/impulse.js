@@ -1,5 +1,6 @@
 /// Copyright by Erik Weitnauer, 2012.
 
+/** Constructor */
 Body = function(position, linear_velocity, mass, rotation, angular_velocity, inertia) {
   this.s = position;
   this.v = linear_velocity;
@@ -12,23 +13,23 @@ Body = function(position, linear_velocity, mass, rotation, angular_velocity, ine
   this.torque = 0;
 }
 
-/// external forces are cleared afterwards
-Body.prototype.integrate = function(h) {
+/** Performs a timestep of dt to the objects using the current force and torque. */
+Body.prototype.integrate = function(dt) {
   if (!this.dynamic) return;
-  // s(t0 + h) = s(t0) + v(t0)*h + 0.5*(1/m)*F*h*h
-  this.s.Add(this.v.scale(h)).Add(this.force.scale(0.5*h*h*this.inv_m));
-  // v(t0 + h) = v(t0) + (1/m)*F*h
-  this.v.Add(this.force.scale(h*this.inv_m));
-  // r(t0 + h) = r(t0) + h*w + 0.5*(1/I)*T*h*h;
-  this.r += h*this.w + 0.5*this.inv_I*this.torque*h*h;
-  // w(t0 + h) = w(t0) + (1/I)*T*h
-  this.w += this.torque*this.inv_I*h;
+  // s(t0 + dt) = s(t0) + v(t0)*dt + 0.5*(1/m)*F*dt^2
+  this.s.Add(this.v.scale(dt)).Add(this.force.scale(0.5*dt*dt*this.inv_m));
+  // v(t0 + dt) = v(t0) + (1/m)*F*dt
+  this.v.Add(this.force.scale(dt*this.inv_m));
+  // r(t0 + dt) = r(t0) + dt*w + 0.5*(1/I)*T*dt*dt;
+  this.r += dt*this.w + 0.5*this.inv_I*this.torque*dt*dt;
+  // w(t0 + dt) = w(t0) + (1/I)*T*dt
+  this.w += this.torque*this.inv_I*dt;
 //  this.force.Set(0,0);
 //  this.torque = 0;
 }
 
-/// Returns the predicted delta in world position of the body after dt. Same as
-/// integration, but does not change the body.
+/** Returns the predicted change of world position of the body after dt.
+    Same as integration, but does not change the body. */
 Body.prototype.predict_ds = function(dt) {
   return this.v.scale(dt).add(this.force.scale(0.5*dt*dt*this.inv_m));
 }
@@ -63,6 +64,11 @@ Body.prototype.to_world = function(pos, dt) {
   return s.add(pos.rotate(r));
 }
 
+/** Returns the passed world position transformed into local coordinates */
+Body.prototype.to_local = function(pos) {
+  return pos.sub(this.s).rotate(-this.r);
+}
+
 /// Returns speed of a body point at s (in global coords).
 Body.prototype.get_v_at = function(s) {
   if (!this.dynamic) return new Point(0, 0);
@@ -70,8 +76,8 @@ Body.prototype.get_v_at = function(s) {
   return new Point(this.v.x - r.y*this.w, this.v.y + r.x*this.w);
 }
 
-/// Returns the matrix describing how a impulse at the passed point will influence
-/// the speed in this point.
+/** Returns the matrix describing how an impulse at the passed point (world coordinates) will
+  influence the body's speed at this point. */
 Body.prototype.getK = function(point) {
   if (!this.dynamic) return new Matrix();
   var r = point.sub(this.s);
@@ -81,6 +87,7 @@ Body.prototype.getK = function(point) {
   return new Matrix(m + I*r.y*r.y, bc, bc, m + I*r.x*r.x);
 }
 
+/** Returns sum of kinetic and potential engery */
 Body.prototype.getEnergy = function(gravity) {
   var kin = 0.5*(1/this.inv_m)*this.v.len2() + 0.5*(1/this.inv_I)*this.w*this.w;
   var pot = -(1/this.inv_m)*gravity.y*this.s.y
