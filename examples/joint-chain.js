@@ -120,7 +120,7 @@ function addBody() {
     pos.x += len/2;
     var b = new Body(pos, new Point(), params.mass.value, -Math.PI*0.5, 0, params.inertia.value);
     world.bodies.push(b);
-    world.joints.push(new Joint(a, new Point(0,len/2), b, new Point(0,-len/2)));  
+    world.joints.push(new Joint(a, b, pos.sub(new Point(len/2, 0))));
   }
 }
 
