@@ -17,6 +17,7 @@
 
 World = function(gravity, pos_it, vel_it) {
   this.gravity = gravity || new Point(0, 10)
+  this.gravity_mode = 'linear'; // 'linear' -> along one direction. 'radial' -> towards one point
   this.bodies = []
   this.joints = []
   this.max_corr_it = pos_it || 10;
@@ -36,24 +37,21 @@ World.prototype.calcEnergy = function() {
   return sum;
 }
 
-World.prototype.stepA = function(h) {
-  this.applyGravity(h);
-  this.jointPositionCorrection(h);
-}
-
-World.prototype.stepB = function(h) {
-  this.integrate(h);
-}
-
-World.prototype.stepC = function(h) {
-  this.jointVelocityCorrection();
-}
-
 World.prototype.step = function(h) {
-  if (this.initial_energy == null) this.initial_energy = this.calcEnergy();
-  this.stepA(h);
-  this.stepB(h);
-  this.stepC(h);
+  //if (this.initial_energy == null) this.initial_energy = this.calcEnergy();
+  
+  // first apply gravity to all objects
+  this.applyGravity(h);
+  
+  // do position correction for all joints
+  //this.jointPositionCorrection(h);
+  
+  // after correction, do integration step ==> move the objects
+  this.integrate(h);
+  
+  // correct the velocities in for all joints
+  //this.jointVelocityCorrection();
+  
   //console.log("Energy difference to start:", this.calcEnergy()-this.initial_energy);
 }
 
@@ -121,8 +119,10 @@ World.prototype.integrate = function(h) {
 World.prototype.applyGravity = function() {
   for (var i=0; i<this.bodies.length; i++) {
     var body = this.bodies[i];
-    //if (body.dynamic) body.applyForce(this.gravity.scale(1/body.inv_m));
-    if (body.dynamic) body.force.Set(this.gravity.scale(1/body.inv_m));
+    if (body.dynamic) {
+      if (this.gravity_mode == 'linear') body.force.Set(this.gravity.scale(1/body.inv_m));
+      else if (this.gravity_mode == 'radial') body.force.Set(this.gravity.sub(body.s).scale(1/body.inv_m));
+    }
   }
 }
 
