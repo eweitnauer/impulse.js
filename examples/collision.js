@@ -3,7 +3,7 @@
 
 // simulation parameters
 var params = {
-  N: {value: 10, range: [0,100], label: "circles", type: 'number'}
+  N: {value: 10, range: [0,50], label: "circles", type: 'number'}
  ,radius: {value: 0.5, postfix: " m", type: 'fixed', label:"radius"}
  ,mass: {value: 1, postfix: " kg", type: 'fixed'}
  ,inertia: {value: 0.125, postfix: " kg*m^2", type: 'fixed'}
@@ -65,10 +65,10 @@ function update_params() {
   // apply parameter values to the simulation
   // body count should be N+1 (the 1 is the static body at the top)
   var N = params.N.value;
-  var N_changed = world.bodies.length != N+1;
-  while (world.bodies.length < N+1) addBody();
-  if (world.bodies.length > N+1) {
-    world.bodies.splice(N+1);
+  var N_changed = world.bodies.length != N;
+  while (world.bodies.length < N) addBody();
+  if (world.bodies.length > N) {
+    world.bodies.splice(N);
   }
   if (N_changed) updateN();
     
