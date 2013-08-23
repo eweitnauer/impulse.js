@@ -5,6 +5,6 @@ based on the work of [Jan Bender](http://www.impulse-based.de).
 
 Implemented so far:
 
-* ball joints (see [chain example](http://phigames.com/impulse/chain/))
+* ball joints (see [chain example](http://naive-physics.com/projects/impulse/))
 
 Erik Weitnauer, 2012.
